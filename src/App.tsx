@@ -6,14 +6,53 @@ import { Register } from './components/Register';
 import { Booking } from './components/Booking';
 import { Catalog } from './components/Catalog';
 import { UserProfile } from './components/UserProfile';
-import { Scissors, Shield, Home, Calendar, User } from 'lucide-react';
+import { Inventory } from './components/Inventory';
+import { Billing } from './components/Billing';
+import { History } from './components/History';
+import { Scissors, Shield, Home, Calendar, User, Package, FileText, History as HistoryIcon, Lock } from 'lucide-react';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'admin' | 'login' | 'register' | 'booking' | 'catalog' | 'profile'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'admin' | 'login' | 'register' | 'booking' | 'catalog' | 'profile' | 'inventory' | 'billing' | 'history'>('home');
 
-  const handleBackToHome = () => setCurrentView('home');
+  // Estado de Autenticación y Roles para pruebas de seguridad
+  const [auth, setAuth] = useState({
+    isAuthenticated: false,
+    role: 'guest', // 'admin' o 'client' o 'guest'
+    userName: ''
+  });
+
+  const [securityAlert, setSecurityAlert] = useState('');
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+    setSecurityAlert('');
+  };
+
   const handleNavigateLogin = () => setCurrentView('login');
   const handleNavigateRegister = () => setCurrentView('register');
+
+  // Guardia de Seguridad para Vistas Protegidas (RF de Seguridad / Control de Acceso)
+  const handleSecureNavigation = (view: 'home' | 'admin' | 'login' | 'register' | 'booking' | 'catalog' | 'profile' | 'inventory' | 'billing' | 'history') => {
+    
+    // 1. Exclusivo para Administrador (Admin Dashboard e Inventario Interno)
+    if (view === 'admin' || view === 'inventory') {
+      if (!auth.isAuthenticated || auth.role !== 'admin') {
+        setSecurityAlert('⚠️ Acceso Denegado: Esta sección es exclusiva para el personal administrativo.');
+        setCurrentView('login');
+        return;
+      }
+    }
+    
+    // 2. Requiere al menos estar Autenticado (Clientes o Admin)
+    if ((view === 'booking' || view === 'profile' || view === 'history' || view === 'billing') && !auth.isAuthenticated) {
+      setSecurityAlert('⚠️ Debes iniciar sesión para agendar citas, ver tu perfil o gestionar pagos.');
+      setCurrentView('login');
+      return;
+    }
+
+    setSecurityAlert('');
+    setCurrentView(view);
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 text-white scroll-smooth">
@@ -24,10 +63,47 @@ export function App() {
         onNavigateRegister={handleNavigateRegister}
       />
 
+      {/* Alerta de Seguridad si se intenta acceso no autorizado */}
+      {securityAlert && (
+        <div className="bg-red-500/10 border-b border-red-500/20 text-red-400 px-6 py-3 text-center text-xs md:text-sm font-semibold flex items-center justify-center gap-2">
+          <Lock size={16} /> {securityAlert}
+        </div>
+      )}
+
+      {/* Panel de Simulación de Roles (Para Pruebas de Seguridad) */}
+      <div className="bg-gray-900 border-b border-gray-800 px-6 py-2 flex flex-wrap justify-between items-center text-xs">
+        <div className="flex items-center gap-2 text-gray-400">
+          <span className="font-bold text-amber-400">Estado de Sesión Actual:</span>
+          <span className={`px-2 py-0.5 rounded-full font-semibold ${auth.isAuthenticated ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
+            {auth.isAuthenticated ? `Conectado como (${auth.role.toUpperCase()})` : 'Modo Visitante (No autenticado)'}
+          </span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setAuth({ isAuthenticated: true, role: 'admin', userName: 'Yeison (Admin)' }); alert('Sesión iniciada como Administrador'); }}
+            className="bg-gray-800 hover:bg-amber-500 hover:text-gray-950 px-3 py-1 rounded-lg font-bold transition-all"
+          >
+            Simular Login Admin
+          </button>
+          <button
+            onClick={() => { setAuth({ isAuthenticated: true, role: 'client', userName: 'Cliente Prueba' }); alert('Sesión iniciada como Cliente'); }}
+            className="bg-gray-800 hover:bg-amber-500 hover:text-gray-950 px-3 py-1 rounded-lg font-bold transition-all"
+          >
+            Simular Login Cliente
+          </button>
+          <button
+            onClick={() => { setAuth({ isAuthenticated: false, role: 'guest', userName: '' }); alert('Sesión cerrada / Visitante'); }}
+            className="bg-gray-800 hover:bg-red-500 hover:text-white px-3 py-1 rounded-lg font-bold transition-all"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+
       {/* Botones flotantes temporales de control rápido para desarrollo */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-wrap gap-2 bg-gray-900 p-2 rounded-2xl border border-gray-800 shadow-2xl">
         <button
-          onClick={handleBackToHome}
+          onClick={() => handleSecureNavigation('home')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             currentView === 'home' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
           }`}
@@ -35,7 +111,7 @@ export function App() {
           <Home size={14} /> Inicio
         </button>
         <button
-          onClick={() => setCurrentView('booking')}
+          onClick={() => handleSecureNavigation('booking')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             currentView === 'booking' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
           }`}
@@ -43,7 +119,23 @@ export function App() {
           <Calendar size={14} /> Citas
         </button>
         <button
-          onClick={() => setCurrentView('profile')}
+          onClick={() => handleSecureNavigation('billing')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            currentView === 'billing' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <FileText size={14} /> Facturación
+        </button>
+        <button
+          onClick={() => handleSecureNavigation('history')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            currentView === 'history' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <HistoryIcon size={14} /> Historial
+        </button>
+        <button
+          onClick={() => handleSecureNavigation('profile')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             currentView === 'profile' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
           }`}
@@ -51,7 +143,15 @@ export function App() {
           <User size={14} /> Perfil
         </button>
         <button
-          onClick={() => setCurrentView('admin')}
+          onClick={() => handleSecureNavigation('inventory')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            currentView === 'inventory' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Package size={14} /> Inventario
+        </button>
+        <button
+          onClick={() => handleSecureNavigation('admin')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             currentView === 'admin' ? 'bg-amber-500 text-gray-950' : 'text-gray-400 hover:text-white'
           }`}
@@ -77,7 +177,7 @@ export function App() {
               </p>
               <div className="flex gap-4">
                 <button 
-                  onClick={() => setCurrentView('booking')}
+                  onClick={() => handleSecureNavigation('booking')}
                   className="bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Scissors size={20} /> Agendar Cita Ahora
@@ -147,7 +247,10 @@ export function App() {
       {currentView === 'login' && <Login onBack={handleBackToHome} onNavigateRegister={handleNavigateRegister} />}
       {currentView === 'register' && <Register onBack={handleBackToHome} onNavigateLogin={handleNavigateLogin} />}
       {currentView === 'booking' && <Booking onBack={handleBackToHome} />}
+      {currentView === 'billing' && <Billing onBack={handleBackToHome} />}
+      {currentView === 'history' && <History onBack={handleBackToHome} />}
       {currentView === 'profile' && <UserProfile />}
+      {currentView === 'inventory' && <Inventory />}
       {currentView === 'admin' && <AdminDashboard />}
 
     </div>

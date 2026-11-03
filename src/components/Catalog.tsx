@@ -1,64 +1,186 @@
 import React from 'react';
-import { Scissors, Clock } from 'lucide-react';
+import { Scissors, Clock, DollarSign, Sparkles } from 'lucide-react';
 
-const servicios = [
-  { id: '1', nombre: 'Corte Clásico / Normal', descripcion: 'Corte de cabello tradicional para caballero con acabado limpio.', precio: 500, duracion: 30, categoria: 'Barbería' },
-  { id: '2', nombre: 'El Dominicano o Guayaito', descripcion: 'Estilo urbano tradicional con marcado preciso de contornos.', precio: 500, duracion: 35, categoria: 'Barbería' },
-  { id: '3', nombre: 'El Blower o Soplado', descripcion: 'Peinado con secador para dar volumen y forma al cabello.', precio: 400, duracion: 25, categoria: 'Barbería' },
-  { id: '4', nombre: 'La Victorino', descripcion: 'Estilo de corte característico de alta demanda local.', precio: 500, duracion: 30, categoria: 'Barbería' },
-  { id: '5', nombre: 'Degradado a la Piel / Desvanecido Cero', descripcion: 'Fade sombreado limpio desde cero a la piel.', precio: 600, duracion: 40, categoria: 'Barbería' },
-  { id: '6', nombre: 'Degradado Medio / Alto / Bajito / Mohicano V', descripcion: 'Diferentes variaciones de cortes degradados según el gusto del cliente.', precio: 600, duracion: 40, categoria: 'Barbería' },
-  { id: '7', nombre: 'Arreglo de Barba & Perfilado', descripcion: 'Recorte, alineado de líneas y toalla caliente para la barba.', precio: 400, duracion: 25, categoria: 'Cuidado Personal' },
-  { id: '8', nombre: 'Tinte Capilar & Coloración', descripcion: 'Aplicación de tinte para cubrir canas o cambio de tono.', precio: 800, duracion: 45, categoria: 'Cuidado Personal' },
-  { id: '9', nombre: 'Tratamiento Facial', descripcion: 'Limpieza e hidratación facial para el cuidado de la piel.', precio: 700, duracion: 30, categoria: 'Cuidado Personal' },
-  { id: '10', nombre: 'Lavado de Cabello & Corte Femenino', descripcion: 'Servicio especializado a cargo de nuestra estilista profesional.', precio: 600, duracion: 45, categoria: 'Estilismo' },
-];
+interface CatalogProps {
+  onSelectService?: (service: { name: string; price: number; duration: number }) => void;
+}
 
-export const Catalog: React.FC = () => {
+export const Catalog: React.FC<CatalogProps> = ({ onSelectService }) => {
+  // Lista de servicios oficial basada en el documento del proyecto (RF-04)
+  const servicesList = [
+    // Barbería Masculina
+    {
+      id: 1,
+      name: 'Corte Normal',
+      category: 'Barbería Masculina',
+      description: 'Corte de cabello tradicional para caballero.',
+      price: 350,
+      duration: 30
+    },
+    {
+      id: 2,
+      name: 'El Dominicano o Guayaito',
+      category: 'Barbería Masculina',
+      description: 'Estilo clásico urbano muy solicitado con acabado impecable.',
+      price: 400,
+      duration: 35
+    },
+    {
+      id: 3,
+      name: 'El Blower o Soplado',
+      category: 'Barbería Masculina',
+      description: 'Secado y moldeado profesional para cabello masculino.',
+      price: 300,
+      duration: 25
+    },
+    {
+      id: 4,
+      name: 'La Victorino',
+      category: 'Barbería Masculina',
+      description: 'Estilo de corte exclusivo y detallado de la casa.',
+      price: 500,
+      duration: 40
+    },
+    {
+      id: 5,
+      name: 'Degradado a la piel (Fade en Cero)',
+      category: 'Barbería Masculina',
+      description: 'Desvanecido preciso desde la piel con acabado limpio.',
+      price: 450,
+      duration: 40
+    },
+    {
+      id: 6,
+      name: 'Degradado Medio',
+      category: 'Barbería Masculina',
+      description: 'Fade a media altura con transición suave y estilizada.',
+      price: 400,
+      duration: 35
+    },
+    {
+      id: 7,
+      name: 'Degradado Alto',
+      category: 'Barbería Masculina',
+      description: 'Desvanecido alto moderno para un look llamativo.',
+      price: 400,
+      duration: 35
+    },
+    {
+      id: 8,
+      name: 'Degradado Bajito',
+      category: 'Barbería Masculina',
+      description: 'Fade sutil en la parte baja de la nuca y sienes.',
+      price: 400,
+      duration: 35
+    },
+    {
+      id: 9,
+      name: 'Mohicano en V',
+      category: 'Barbería Masculina',
+      description: 'Estilo mohicano con terminación artística en forma de V.',
+      price: 500,
+      duration: 45
+    },
+
+    // Cuidado Personal y Barbería
+    {
+      id: 10,
+      name: 'Arreglo de Barba',
+      category: 'Cuidado Personal',
+      description: 'Recorte, perfilado y definición de barba con navaja.',
+      price: 300,
+      duration: 25
+    },
+    {
+      id: 11,
+      name: 'Tinte',
+      category: 'Cuidado Personal',
+      description: 'Aplicación de tinte para cabello o cobertura de canas.',
+      price: 600,
+      duration: 45
+    },
+    {
+      id: 12,
+      name: 'Facial',
+      category: 'Cuidado Personal',
+      description: 'Limpieza facial profunda y mascarilla para el cuidado de la piel.',
+      price: 700,
+      duration: 40
+    },
+    {
+      id: 13,
+      name: 'Lavado de Cabello',
+      category: 'Cuidado Personal',
+      description: 'Lavado revitalizante con productos capilares profesionales.',
+      price: 200,
+      duration: 15
+    },
+
+    // Estilismo Femenino
+    {
+      id: 14,
+      name: 'Corte de Cabello Femenino',
+      category: 'Estilismo',
+      description: 'Corte, mantenimiento de puntas y estilismo para damas.',
+      price: 800,
+      duration: 50
+    }
+  ];
+
   return (
-    <section id="servicios" className="py-16 px-6 max-w-6xl mx-auto">
+    <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="text-center space-y-3 mb-12">
-        <h2 className="text-3xl font-extrabold tracking-wider text-amber-500 uppercase">
-          Catálogo de Servicios
+        <span className="bg-amber-500/10 text-amber-400 px-4 py-1.5 rounded-full text-xs font-semibold border border-amber-500/20 uppercase tracking-wider">
+          Catálogo Oficial RF-04
+        </span>
+        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+          NUESTROS <span className="text-amber-500">SERVICIOS</span>
         </h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">
-          Explora los servicios ofrecidos en Yeison Barber Style por nuestros barberos y estilista.
+        <p className="text-gray-400 max-w-2xl mx-auto text-sm md:text-base">
+          Explora la gama completa de servicios de barbería masculina, cuidado personal y estilismo que ofrecemos en Yeison Barber Style[cite: 7].
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {servicios.map((s) => (
+        {servicesList.map((service) => (
           <div 
-            key={s.id}
-            className="bg-neutral-900 border border-neutral-800 rounded-xl p-5 hover:border-amber-500/50 transition flex flex-col justify-between space-y-4 shadow-xl"
+            key={service.id}
+            className="bg-gray-900 rounded-2xl p-6 border border-gray-800 hover:border-amber-500/50 transition-all flex flex-col justify-between shadow-xl group"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex justify-between items-start">
-                <span className="text-xs font-semibold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded">
-                  {s.categoria}
+                <span className="text-xs font-semibold px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">
+                  {service.category}
                 </span>
-                <span className="flex items-center text-xs text-neutral-400 space-x-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{s.duracion} min</span>
+                <span className="text-amber-400 font-bold text-lg flex items-center">
+                  <DollarSign size={16} /> {service.price}
                 </span>
               </div>
-              <h3 className="font-bold text-lg text-white pt-1">{s.nombre}</h3>
-              <p className="text-neutral-400 text-sm leading-relaxed">{s.descripcion}</p>
+
+              <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
+                {service.name}
+              </h3>
+
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {service.description}
+              </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
-              <div>
-                <p className="text-xs text-neutral-400">Precio</p>
-                <p className="text-xl font-extrabold text-amber-400">RD$ {s.precio}</p>
-              </div>
-              <button className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-black font-bold text-xs rounded transition flex items-center space-x-1">
-                <Scissors className="w-4 h-4" />
-                <span>SELECCIONAR</span>
+            <div className="pt-6 mt-6 border-t border-gray-800/80 flex items-center justify-between">
+              <span className="text-xs text-gray-400 flex items-center gap-1.5 font-medium">
+                <Clock size={14} className="text-amber-500" /> {service.duration} minutos
+              </span>
+
+              <button
+                onClick={() => onSelectService && onSelectService(service)}
+                className="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-gray-950 font-semibold px-4 py-2 rounded-xl text-xs transition-all border border-amber-500/20 cursor-pointer flex items-center gap-1.5"
+              >
+                <Sparkles size={14} /> Seleccionar
               </button>
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 };
