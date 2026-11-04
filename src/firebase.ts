@@ -3,13 +3,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyC19VMPmrztPgLkPk1A7z9UX6LlpOfg3uw",
+  authDomain: "yeison-barber-style.firebaseapp.com",
+  databaseURL: "https://yeison-barber-style-default-rtdb.firebaseio.com",
+  projectId: "yeison-barber-style",
+  storageBucket: "yeison-barber-style.firebasestorage.app",
+  messagingSenderId: "751165070257",
+  appId: "1:751165070257:web:ad8fc63bf23fe947987b90",
+  measurementId: "G-5BLMG28HDG"
 };
 
 const app = initializeApp(firebaseConfig);
